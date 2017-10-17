@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from typing import List, Dict, Union
+from typing import List
 
 import pandas as pd
 

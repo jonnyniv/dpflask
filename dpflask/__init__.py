@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
-from dpflask import db
 
+from dpflask import db
 
 app = Flask(__name__)
 connection = db.connect_db()
