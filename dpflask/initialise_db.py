@@ -1,4 +1,4 @@
-import db
+from dpflask import db
 import pandas as pd
 
 

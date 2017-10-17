@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-import db
+from dpflask import db
 
 
 app = Flask(__name__)
