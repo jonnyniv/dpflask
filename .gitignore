@@ -3,3 +3,5 @@
 .idea/
 iowa.csv
 dpflask-venv
+__pycache__/
+*.db
