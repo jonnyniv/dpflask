@@ -1,4 +1,13 @@
 language: python
 python:
-    - "3.6"
-script: python setup.py test
+  - "3.6"
+jobs:
+  include:
+  - stage: init
+    script: python dpflask/initialise_db.py
+  - stage: test
+    script: python setup.py test
+
+stages:
+  - init
+  - test
