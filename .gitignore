@@ -5,3 +5,5 @@ iowa.csv
 dpflask-venv
 __pycache__/
 *.db
+.eggs/
+*.egg-info/
