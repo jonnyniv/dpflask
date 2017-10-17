@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify
 from dpflask import db
+from dpflask.inititalise_db import create_db
+
 
 app = Flask(__name__)
+connection = db.connect_db()
 
 
 @app.route('/')
@@ -12,13 +15,15 @@ def test():
 @app.route('/get_voters_where', methods=['GET'])
 def get_voters():
     args = request.args
-    result = db.get_voters_where(county=args.get('county'),
-                                 month=args.get('month'),
-                                 party=args.get('party'),
-                                 status=args.get('status'),
-                                 limit=args.get('limit'))
+    result = db.get_voters_where(args, connection)
     return jsonify(result)
 
 
-if __name__ == '__main__':
+def main():
     app.run()
+
+
+if __name__ == '__main__':
+    main()
+
+

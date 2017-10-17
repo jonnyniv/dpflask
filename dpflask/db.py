@@ -1,61 +1,53 @@
 import os
 import sqlite3
-from typing import List
+from typing import List, Dict, Union
 
 import pandas as pd
 
-connection = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'dpflask.db'))
+
+def connect_db() -> sqlite3.Connection:
+    return sqlite3.connect(os.path.join(os.path.dirname(__file__), 'dpflask.db'))
 
 
-def create_db():
-    df = pd.read_csv('../iowa.csv')
-    months = df['Date']
-    df['Month'] = [row[:2] for _, row in months.iteritems()]
-    df.to_sql('dpflask', connection, if_exists='replace')
-
-
-# create_db()
-
-
-def get_cols():
+def get_cols(connection: sqlite3.Connection) -> List[str]:
     colcurs = connection.cursor()
     colcurs.execute("SELECT * FROM dpflask")
     columns = next(zip(*colcurs.description))
     return columns
 
-columns = get_cols()
-party_status = [a for a in [[x.strip() for x in col.split('-')] for col in columns] if len(a) > 1]
-party_dict = {}
-status_dict = {}
-all_parts = set()
-for ps in party_status:
-    party_stat_str = {ps[0] + ' - ' + ps[1]}
-    par = party_dict.get(ps[0], set())
-    stat = status_dict.get(ps[1], set())
-    par |= party_stat_str
-    stat |= party_stat_str
-    all_parts |= party_stat_str
-    party_dict[ps[0]] = par
-    status_dict[ps[1]] = stat
 
-
-def list_ps(party: str = '', status: str = '') -> List[str]:
-    if party and status:
-        return [f'{party} - {status}']
-    elif party:
-        return [a for a in party_dict[party]]
-    elif status:
-        return [a for a in status_dict[status]]
+def filter_columns(party: str, status: str) -> List[str]:
+    new_cols = ['county', 'date']
+    parties = ['dem', 'lib', 'no_party', 'other', 'rep']
+    activity = ['active', 'inactive']
+    ps = []
+    if party and party in parties:
+        ps.append(party)
     else:
-        return list(all_parts)
+        ps = parties
+    if status and status in activity:
+        ps = ['_'.join((p, status)) for p in ps]
+    else:
+        ps = ['_'.join((p, s)) for p in ps for s in activity]
+    return new_cols + ps
 
 
-def get_voters_where(county: str = '', month: str = '', party: str = '', status: str = '', limit: int = None) -> list:
-    base_query = "SELECT * FROM dpflask"
+def get_args(args):
+    county = args.get('county', '')
+    party = args.get('party', '')
+    status = args.get('status', '')
+    month = args.get('month', '')
+    limit = args.get('limit', 100)
+    return county, party, status, month, limit
+
+
+def get_voters_where(args, connection: sqlite3.Connection) -> list:
+    county, party, status, month, limit = get_args(args)
+    new_columns = filter_columns(party, status)
+    base_query = "SELECT {} FROM dpflask".format(', '.join(new_columns))
     cursor = connection.cursor()
     params = []
-    if month: month = month.zfill(2)
-    for param, name in zip((county, month), ('County', 'Month')):
+    for param, name in zip((county, month), ('county', 'month')):
         if param:
             params.append(param)
             if 'WHERE' in base_query:
@@ -68,12 +60,8 @@ def get_voters_where(county: str = '', month: str = '', party: str = '', status:
         params.append(limit)
 
     cursor.execute(base_query, params)
-    df = pd.DataFrame(cursor.fetchall(), columns=columns).set_index('index')
-    party_stat = list_ps(party, status)
-    if month:
-        df = df.loc[df['Date'].str.startswith(month)]
-    if party_stat:
-        df = pd.merge(df[party_stat], df[['Date', 'County', 'Grand Total']], left_index=True, right_index=True)
+    connection.commit()
+    df = pd.DataFrame(cursor.fetchall(), columns=new_columns)
     output = [row.to_dict() for _, row in df.iterrows()]
 
     return output
