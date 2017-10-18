@@ -2,4 +2,5 @@ language: python
 python:
   - "3.6"
 before_script: python dpflask/initialise_db.py
-script: python setup.py test
+script: pytest tests
+script: mypy dpflask

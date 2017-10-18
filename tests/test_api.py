@@ -27,9 +27,7 @@ def test_gvw_endpoint_graceful(v):
 
 
 valid_vars = ['county', 'party', 'status', 'month', 'limit']
-valid_vars_strat = st.dictionaries(st.one_of(st.sampled_from(valid_vars), st.text()),
-                                   st.text(),
-                                   max_size=5)
+valid_vars_strat = st.dictionaries(st.one_of(st.sampled_from(valid_vars), st.text()), st.text(), max_size=5)
 
 
 @given(valid_vars_strat)

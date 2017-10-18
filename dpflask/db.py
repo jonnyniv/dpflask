@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from typing import List
+from typing import List, Dict, Tuple, Union
 from flask import abort, jsonify
 
 import pandas as pd
@@ -33,21 +33,21 @@ def filter_columns(party: str, status: str) -> List[str]:
     return new_cols + ps
 
 
-def get_args(args):
+def get_args(args: Dict[str, str]) -> Tuple[str, str, str, str, str]:
     county = args.get('county', '')
     party = args.get('party', '')
     status = args.get('status', '')
     month = args.get('month', '')
-    limit = args.get('limit', 100)
+    limit = args.get('limit', '100')
     return county, party, status, month, limit
 
 
-def get_voters_where(args, connection: sqlite3.Connection) -> list:
+def get_voters_where(args: Dict[str, str], connection: sqlite3.Connection) -> str:
     county, party, status, month, limit = get_args(args)
     new_columns = filter_columns(party, status)
     base_query = "SELECT {} FROM dpflask".format(', '.join(new_columns))
     cursor = connection.cursor()
-    params = []
+    params: List[Union[str, int]] = []
     for param, name in zip((county, month), ('county', 'month')):
         if param:
             params.append(param)
