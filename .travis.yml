@@ -2,5 +2,6 @@ language: python
 python:
   - "3.6"
 before_script: python dpflask/initialise_db.py
-script: pytest tests
-script: mypy dpflask --ignore-missing-imports
+script:
+  - pytest tests
+  - mypy dpflask --ignore-missing-imports
