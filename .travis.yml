@@ -3,4 +3,4 @@ python:
   - "3.6"
 before_script: python dpflask/initialise_db.py
 script: pytest tests
-script: mypy dpflask
+script: mypy dpflask --ignore-missing-imports
