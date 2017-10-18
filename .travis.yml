@@ -4,4 +4,4 @@ python:
 before_script: python initialise_db.py
 script:
   - pytest tests
-  - mypy dpflask --ignore-missing-imports
+  - mypy . --ignore-missing-imports
