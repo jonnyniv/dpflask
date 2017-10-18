@@ -1,6 +1,7 @@
 import os
 import sqlite3
 from typing import List
+from flask import abort, jsonify
 
 import pandas as pd
 
@@ -56,12 +57,19 @@ def get_voters_where(args, connection: sqlite3.Connection) -> list:
                 base_query += f' WHERE {name}=?'
 
     if limit is not None:
-        base_query += " LIMIT ?"
-        params.append(limit)
+        try:
+            numlim = int(limit)
+        except ValueError:
+            return abort(400)
+        else:
+            if numlim < 0:
+                return abort(400)
+            base_query += " LIMIT ?"
+            params.append(numlim)
 
     cursor.execute(base_query, params)
     connection.commit()
     df = pd.DataFrame(cursor.fetchall(), columns=new_columns)
     output = [row.to_dict() for _, row in df.iterrows()]
 
-    return output
+    return jsonify(output)
