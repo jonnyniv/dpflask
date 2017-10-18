@@ -1,6 +1,6 @@
 from hypothesis import strategies as st, given
 import dpflask
-import pytest
+
 
 app = dpflask.app.test_client()
 app.testing = True
