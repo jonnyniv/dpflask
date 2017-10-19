@@ -1,6 +1,8 @@
 language: python
 python:
   - "3.6"
+env:
+  - MYPYPATH='stubs'
 before_script: python initialise_db.py
 script:
   - pytest tests

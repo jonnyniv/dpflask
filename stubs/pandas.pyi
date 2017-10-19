@@ -1,0 +1,9 @@
+from typing import Any, Iterable, Tuple
+
+class DataFrame:
+    def __init__(self, *args, **kwargs) -> None: ...
+    def iterrows(self) -> Iterable: ...
+    columns: Any
+    shape: Tuple[int, ...]
+
+def read_json(url: str) -> DataFrame: ...
