@@ -1,5 +1,6 @@
 from hypothesis import strategies as st, given
 import dpflask
+import pytest
 
 
 app = dpflask.app.test_client()
@@ -37,4 +38,17 @@ def test_valid_ep(req_dict: dict):
         req_str += f'{k}={v}&'
 
     req = app.get('/get_voters_where' + req_str)
+    assert not req.status.startswith('5')
+
+
+@pytest.mark.parametrize(
+    "string", [
+        "1;DROP TABLE users",
+        "1'; DROP TABLE users-- 1",
+        "' OR 1=1 -- 1",
+        "' OR '1'='1",
+    ]
+)
+def test_sql_inj(string):
+    req = app.get('/get_voters_where?county='+string)
     assert not req.status.startswith('5')
