@@ -2,7 +2,7 @@
 .hypothesis/
 .idea/
 iowa.csv
-dpflask-venv
+dpflask-env
 __pycache__/
 *.db
 .eggs/

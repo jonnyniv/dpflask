@@ -3,3 +3,4 @@ hypothesis
 flask
 pandas
 mypy
+flake8

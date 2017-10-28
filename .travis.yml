@@ -2,9 +2,10 @@ sudo: false
 language: python
 python:
   - "3.6"
-env:
-  - MYPYPATH='stubs'
 before_script: python initialise_db.py
 script:
+  - mypy dpflask
+  - mypy tests --ignore-missing-imports
+  - flake8 dpflask
+  - flake8 tests
   - pytest tests
-  - mypy . --ignore-missing-imports
