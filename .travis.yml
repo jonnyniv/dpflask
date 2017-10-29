@@ -2,7 +2,7 @@ sudo: false
 language: python
 python:
   - "3.6"
-before_script: python initialise_db.py
+before_script: make init
 script:
   - make lint
   - make test
